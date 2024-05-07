@@ -4,4 +4,6 @@ project(ADS_2Sem_Labs)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(ADS_2Sem_Labs
-        Lab_1/Set.h)
+        Lab_1/Set.h
+        Lab_1/Set.cpp
+        Lab_1/Source.cpp)
