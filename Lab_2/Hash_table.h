@@ -52,6 +52,7 @@ public:
         }
         return *this;
     }
+    //функция печати хэш-таблицы
     void print() {
         for (size_t i = 0; i < _data.size(); ++i) {
             std::cout << "Bucket " << i << ": ";
@@ -61,16 +62,20 @@ public:
             std::cout << std::endl;
         }
     }
+
+    //вставка элемента пары ключ-значение в соответствующий бакет по индексу, вычисленному хэш-функцией
     void insert(K key, V value) {
         size_t index = hash_function(key);
         if (_data[index].size()) _collisions++;
         for (auto& pair : _data[index]) {
-//            if (pair.key == key) {
-//                return;
-//            }
+            if (pair.key == key) {
+                return;
+            }
         }
         _data[index].push_back(Pair(key, value));
     }
+
+    //вставка элемент или изменение значения по указанному ключу
     void insert_or_assign(K key, V value) {
         size_t index = hash_function(key);
         for (auto& pair : _data[index]) {
@@ -81,6 +86,8 @@ public:
         }
         _data[index].push_back(Pair(key, value));
     }
+
+    //проверка наличия заданного значения в таблице
     bool contains(V value) {
         for (const auto& bucket : _data) {
             for (const auto& pair : bucket) {
@@ -91,6 +98,8 @@ public:
         }
         return false;
     }
+
+    //поиск значения по ключу
     V* search(K key) {
         size_t index = hash_function(key);
         for (auto& pair : _data[index]) {
@@ -100,6 +109,7 @@ public:
         }
         return nullptr;
     }
+    //удаление элемента из таблицы по заданному ключу
     bool erase(K key) {
         size_t index = hash_function(key);
         for (auto& pair : _data[index]) {
@@ -110,16 +120,20 @@ public:
         }
         return false;
     }
+
+    //возвращает количество элементов по заданному ключу
     int count(K key) {
         size_t index = hash_function(key);
         return _data[index].size();
     }
+
+    //возвращает количество коллизий в хэш-таблице
     size_t get_collisions() const {
         return _collisions;
     }
 };
 
-
+//реализация алгоритма хэширования Пирсона для строк
 unsigned char Pearson_hash(string str) {
     static const unsigned char T[256] = {
             98,  6, 85,150, 36, 23,112,164,135,207,169,  5, 26, 64,165,219,
@@ -145,7 +159,7 @@ unsigned char Pearson_hash(string str) {
     }
     return hash;
 }
-
+//функция для сравнения хэшей
 bool hash_compare(string str, int hash) {
     int str_hash = Pearson_hash(str);
     if (str_hash == hash) {
