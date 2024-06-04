@@ -9,4 +9,8 @@ add_executable(ADS_2Sem_Labs
         Lab_1/Source.cpp
         Lab_1/Task.cpp
         Lab_2/Hash_table.h
-        Lab_2/Source.cpp)
+        Lab_2/Source.cpp
+        Lab_3/Graph.h
+        Lab_3/Source.cpp
+        Lab_3/Task.h
+)
