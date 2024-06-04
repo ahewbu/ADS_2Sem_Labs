@@ -136,6 +136,83 @@ public:
             std::cout << std::endl;
         }
     }
+    std::vector<Edge> shortest_path(const Vertex& from, const Vertex& to) const {
+        if (!has_vertex(from) || !has_vertex(to))
+            return {};
+
+        for (const Vertex& vertex : _vertices) {
+            for (const Edge& edge : _edges.at(vertex)) {
+                if (edge.distance < 0) {
+                    throw std::runtime_error("The graph contains negative weights");
+                }
+                if (edge.to == vertex) {
+                    throw std::runtime_error("There are cycles in the graph");
+                }
+            }
+        }
+
+        std::unordered_map<Vertex, Distance> distances;
+        std::unordered_map<Vertex, Vertex> prev;
+
+        for (const auto& vertex : _vertices)
+            distances[vertex] = INF;
+        distances[from] = 0;
+
+        std::priority_queue<std::pair<Distance, Vertex>, std::vector<std::pair<Distance, Vertex>>, std::greater<std::pair<Distance, Vertex>>> pq;
+        pq.push({ 0, from });
+
+        while (!pq.empty()) {
+            Vertex u = pq.top().second;
+            pq.pop();
+
+            if (u == to) {
+                std::vector<Edge> path;
+                Vertex current = to;
+                while (current != from) {
+                    for (const auto& edge : _edges.at(prev[current])) {
+                        if (edge.to == current) {
+                            path.push_back(edge);
+                            break;
+                        }
+                    }
+                    current = prev[current];
+                }
+                std::reverse(path.begin(), path.end());
+                return path;
+            }
+
+            if (distances[u] < INF) {
+                for (const auto& edge : _edges.at(u)) {
+                    Distance alt = distances[u] + edge.distance;
+                    if (alt < distances[edge.to]) {
+                        distances[edge.to] = alt;
+                        prev[edge.to] = u;
+                        pq.push({ alt, edge.to });
+                    }
+                }
+            }
+        }
+        return {};
+    }
+
+    void dfs(const Vertex& start_vertex, std::function<void(const Vertex&)> action) const {
+        std::unordered_map<Vertex, Color> colors;
+        std::vector<Vertex> result;
+        for (const Vertex& vertex : _vertices)
+            colors[vertex] = Color::White;
+        dfs_helper(start_vertex, colors, action, result);
+    }
+
+    void dfs_helper(const Vertex& start_vertex, std::unordered_map<Vertex, Color>& colors,
+                    std::function<void(const Vertex&)> action, std::vector<Vertex>& result) const {
+        colors[start_vertex] = Color::Grey;
+        action(start_vertex);
+        result.push_back(start_vertex);
+        for (const Edge& edge : _edges.at(start_vertex))
+            if (colors[edge.to] == Color::White)
+                dfs_helper(edge.to, colors, action, result);
+        colors[start_vertex] = Color::Black;
+    }
 };
 
 #endif
